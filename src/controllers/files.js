@@ -5,6 +5,7 @@ const getDataFiles = async (req, res) => {
     let response = null;
     if (req.query.name) {
       response = await parseFilesDataToJson(req.query.name);
+      response = [response];
     } else {
       const { data } = await getFilesByToolbox();
       const promises = data.files.map(async (fileName) => {
