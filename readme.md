@@ -21,6 +21,11 @@ npm run start
 docker build . -p 3000:3000 -t toolbox-server:lastet
 ```
 
+## Test
+```bash
+npm run test
+```
+
 ## link
 
 https://toolbox-server-test.onrender.com
