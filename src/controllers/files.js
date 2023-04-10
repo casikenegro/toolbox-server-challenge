@@ -1,28 +1,29 @@
-const { default: axios } = require("axios");
-const { csvJSON } = require("../utils");
+const { getFilesByToolbox, parseFilesDataToJson } = require("../utils");
 
-const getFileByName = async (req, res) => {
+const getDataFiles = async (req, res) => {
   try {
-    const response = await axios({
-      url:`https://echo-serv.tbxnet.com/v1/secret/file/${req.query.name}`,
-      responseType: "blob" ,
-      headers: { Authorization: `Bearer aSuperSecretKey` }
-    })
-    return res.send({ file: req.query.name, lines: csvJSON(response.data) });
+    let response = null;
+    if (req.query.name) {
+      response = await parseFilesDataToJson(req.query.name);
+    } else {
+      const { data } = await getFilesByToolbox();
+      const promises = data.files.map(async (fileName) => {
+        return parseFilesDataToJson(fileName);
+      });
+      response = await Promise.all(promises);
+    }
+    return res.send(response);
   } catch (error) {
     return res.status(500).send({ message: "server error" });
   }
 };
 
 const getFiles = async (req, res) => {
-  const response = await axios.get(
-    "https://echo-serv.tbxnet.com/v1/secret/files",
-    { headers: { Authorization: `Bearer aSuperSecretKey` } }
-  );
+  const response = await getFilesByToolbox();
   return res.send(response.data);
 };
 
 module.exports = {
   getFiles,
-  getFileByName,
+  getDataFiles,
 };
